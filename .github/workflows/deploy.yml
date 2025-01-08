@@ -1,8 +1,10 @@
 name: Build and Push Docker Image to ECR and EKS
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-push-image:
     runs-on: ubuntu-latest
@@ -33,7 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-push-image
     steps:
-
       - name: Set up MySQL client
         run: |
           sudo apt-get update && sudo apt upgrade -y
@@ -45,21 +46,19 @@ jobs:
         with:
           path: deployment-flag.txt
           key: rds-deployment-${{ github.sha }}
-    
-    - name: Check Deployment Status
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        echo "Deployment not yet performed. Proceeding with deployment."
-        echo "deployed" > deployment-flag.txt
-    
-        # Run the deployment
-        mysql -h ${{secrets.RDS_ENDPOINT}} -u ${{secrets.RDS_USERNAME}} -p${{secrets.RDS_PASSWORD}} ${{secrets.DATABASE_NAME}} < ./assets/db-load-script.sql
-    
-    - name: Skip Deployment
-      if: steps.cache.outputs.cache-hit == 'true'
-      run: echo "Deployment already completed. Skipping."
-    
-        
+
+      - name: Check Deployment Status
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Deployment not yet performed. Proceeding with deployment."
+          echo "deployed" > deployment-flag.txt
+          # Run the deployment
+          mysql -h ${{ secrets.RDS_ENDPOINT }} -u ${{ secrets.RDS_USERNAME }} -p${{ secrets.RDS_PASSWORD }} ${{ secrets.DATABASE_NAME }} < ./assets/db-load-script.sql
+
+      - name: Skip Deployment
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: echo "Deployment already completed. Skipping."
+
   deploy-to-eks:
     runs-on: ubuntu-latest
     needs: deploy-sqlScript-rds
@@ -75,7 +74,8 @@ jobs:
 
       - name: Update kubeconfig for EKS
         run: |
-          aws eks update-kubeconfig --name ${{secrets.CLUSTER_NAME}} --region ${{ secrets.AWS_REGION }}
+          aws eks update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
       - name: Kubectl tool installer
         uses: Azure/setup-kubectl@v4.0.0
         id: install
@@ -90,6 +90,3 @@ jobs:
             kubectl create namespace php
           fi
           kubectl apply -f .
-      
-
-            
