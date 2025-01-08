@@ -73,7 +73,7 @@ jobs:
 
       - name: Deploy kube manifests
         run: |
-          cd kube-manifests
+          cd ./kube-manifests
           if ! kubectl get namespace php >/dev/null 2>&1; then
             kubectl create namespace php
           fi
