@@ -73,7 +73,10 @@ jobs:
 
       - name: Create or Update Database Secrets
         run: |
-          kubectl create namespace php
+          if ! kubectl get namespace php >/dev/null 2>&1; then
+            kubectl create namespace php
+          fi
           kubectl apply -f ./kube-manifests
+      
 
             
