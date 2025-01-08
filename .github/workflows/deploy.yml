@@ -71,8 +71,10 @@ jobs:
         uses: Azure/setup-kubectl@v4.0.0
         id: install
 
-      - name: Deploy kube manifests
+      - name: checkout
         uses: actions/checkout@v3
+
+      - name: Deploy kube manifests
         working-directory: kube-manifests
         run: |
         
