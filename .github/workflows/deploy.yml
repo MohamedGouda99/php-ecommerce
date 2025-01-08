@@ -71,12 +71,13 @@ jobs:
         uses: Azure/setup-kubectl@v4.0.0
         id: install
 
-      - name: Create or Update Database Secrets
+      - name: Deploy kube manifests
         run: |
+          cd kube-manifests
           if ! kubectl get namespace php >/dev/null 2>&1; then
             kubectl create namespace php
           fi
-          cd kube-manifests
+ 
           kubectl apply -f .
       
 
