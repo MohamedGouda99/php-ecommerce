@@ -40,6 +40,9 @@ jobs:
           sudo apt-get update && sudo apt upgrade -y
           sudo apt-get install -y mysql-client
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Cache Deployment Flag
         id: cache
         uses: actions/cache@v3
@@ -48,12 +51,13 @@ jobs:
           key: rds-deployment-${{ github.sha }}
 
       - name: Check Deployment Status
+        working-directory: assets
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           echo "Deployment not yet performed. Proceeding with deployment."
           echo "deployed" > deployment-flag.txt
           # Run the deployment
-          mysql -h ${{ secrets.RDS_ENDPOINT }} -u ${{ secrets.RDS_USERNAME }} -p${{ secrets.RDS_PASSWORD }} ${{ secrets.DATABASE_NAME }} < ./assets/db-load-script.sql
+          mysql -h ${{ secrets.RDS_ENDPOINT }} -u ${{ secrets.RDS_USERNAME }} -p${{ secrets.RDS_PASSWORD }} ${{ secrets.DATABASE_NAME }} < db-load-script.sql
 
       - name: Skip Deployment
         if: steps.cache.outputs.cache-hit == 'true'
