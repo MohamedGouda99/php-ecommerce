@@ -76,7 +76,7 @@ jobs:
           if ! kubectl get namespace php >/dev/null 2>&1; then
             kubectl create namespace php
           fi
-          cd $GITHUB_WORKSPACE/k8s-manifests
+          cd $GITHUB_WORKSPACE/kube-manifests
           kubectl apply -f .
       
 
